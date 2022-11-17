@@ -12,7 +12,6 @@ class Token {
           amount,
         }),
       });
-      console.log(purchaseToken);
       purchaseToken = await purchaseToken.json();
       return purchaseToken;
     } catch (error) {
