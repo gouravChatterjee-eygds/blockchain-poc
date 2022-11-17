@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body{
+    background: #F8F8F8;
+  }
+  .btn-cus{
+    @apply text-white font-bold py-1 px-3 rounded focus:outline-none;
+  }
+  
+  .poc-input{
+    @apply text-sm text-gray-500 w-full mr-3 py-5 px-4 h-2 shadow-lg rounded mb-4;
+  }
+  
+  .poc-input:focus {
+    outline:none !important;
+    border-color: #008454 !important;
+  }
+  
