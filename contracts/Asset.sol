@@ -39,8 +39,11 @@ contract Asset is ERC721, Ownable, ERC721Enumerable {
     ) public returns (uint256) {
         uint256 tokenID = _tokenIdCounter.current();
         address userAddress = msg.sender;
-        _tokenIdCounter.increment();
-        _safeMint(userAddress, tokenID);
+        _tokenIdCounter.increment(); // Token Id Increment
+
+        _safeMint(userAddress, tokenID); // Mint Asset
+
+        // Update asset array with the asset details
         asset[tokenID] = AssetDetails(tokenID, name, desc, 0);
         ownershipHistory[tokenID].push(AssetHistory(userAddress, time));
         return tokenID;
@@ -52,11 +55,12 @@ contract Asset is ERC721, Ownable, ERC721Enumerable {
             "You don't have enough currency"
         );
         // Transfer currency
-        currencyToken.approveToken(
+        currencyToken.approveToken( // Approve erc20 tokens
             msg.sender,
             address(this),
             asset[tokenID].price
         );
+        // Check if currency is sent properly
         bool paymentDone = currencyToken.transferFrom(
             msg.sender,
             lastAssetOwner(tokenID),
@@ -108,6 +112,8 @@ contract Asset is ERC721, Ownable, ERC721Enumerable {
 
     function listAsset(uint256 tokenId, uint256 price) public returns (bool) {
         require(lastAssetOwner(tokenId) == msg.sender, "Not correct owner");
+
+        // Transfer ownership to the contract
         transferFrom(msg.sender, address(this), tokenId);
         asset[tokenId].price = price;
         return true;

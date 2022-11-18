@@ -91,6 +91,25 @@ class Asset {
       console.log(error);
     }
   };
+
+  assetHistory = async (address, tokenId) => {
+    try {
+      let assetHistory = await fetch(`${apiUrl}/asset/history`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          address,
+          tokenId,
+        }),
+      });
+      assetHistory = await assetHistory.json();
+      return assetHistory;
+    } catch (error) {
+      console.log(error);
+    }
+  };
 }
 
 export default new Asset();
