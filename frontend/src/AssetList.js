@@ -31,7 +31,11 @@ function AssetList() {
   };
 
   const buyAsset = async (tokenId) => {
-    await Asset.buyAsset(address, tokenId, Date.now());
+    let buyAsset = await Asset.buyAsset(address, tokenId, Date.now());
+    console.log(buyAsset);
+    if (buyAsset.statusCode === 502) {
+      alert("You do not have sufficient tokens");
+    }
     getAssetList();
   };
 

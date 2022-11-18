@@ -37,14 +37,14 @@ async function createAsset(req) {
 async function getListedAssetList() {
   try {
     const assetContractDetails = assetContract(AssetContractAddress.Asset);
-    let getAssetList = await assetContractDetails.userAssetDetails();
+    let getAssetList = await assetContractDetails.assetList();
     getAssetList = getAssetList.filter((asset) => asset.name !== "");
     let assetList = getAssetList.map((asset) => {
       return {
         id: asset.id.toNumber(),
         name: asset.name,
         desc: asset.desc,
-        readyForSell: asset.price.toNumber() > 0,
+        listed: asset.listed,
         price: asset.price.toNumber(),
       };
     });
@@ -58,14 +58,14 @@ async function getListedAssetList() {
 async function getAssetListofUser(req) {
   try {
     const assetContractDetails = assetContract(req.body.address);
-    let getAssetList = await assetContractDetails.userAssetDetails();
+    let getAssetList = await assetContractDetails.assetList();
     getAssetList = getAssetList.filter((asset) => asset.name !== "");
     let assetList = getAssetList.map((asset) => {
       return {
         id: asset.id.toNumber(),
         name: asset.name,
         desc: asset.desc,
-        readyForSell: asset.price.toNumber() > 0,
+        listed: asset.listed,
         price: asset.price.toNumber(),
       };
     });
@@ -100,7 +100,7 @@ async function buyAsset(req) {
     return { statusCode: 200 };
   } catch (err) {
     console.error(`NFTMarketContract: `, err.message);
-    return { success: false };
+    return { statusCode: 502 };
   }
 }
 
@@ -117,7 +117,7 @@ async function getAssetOwnershipHistory(req) {
     return { statusCode: 200, assetHistory: assetHistory };
   } catch (error) {
     console.error(`assetContract: `, err.message);
-    return { success: false };
+    return { statusCode: 502 };
   }
 }
 

@@ -18,6 +18,7 @@ struct AssetDetails {
     string name;
     string desc;
     uint256 price;
+    bool listed;
 }
 
 contract Asset is ERC721, Ownable, ERC721Enumerable {
@@ -44,7 +45,7 @@ contract Asset is ERC721, Ownable, ERC721Enumerable {
         _safeMint(userAddress, tokenID); // Mint Asset
 
         // Update asset array with the asset details
-        asset[tokenID] = AssetDetails(tokenID, name, desc, 0);
+        asset[tokenID] = AssetDetails(tokenID, name, desc, 0, false);
         ownershipHistory[tokenID].push(AssetHistory(userAddress, time));
         return tokenID;
     }
@@ -75,23 +76,24 @@ contract Asset is ERC721, Ownable, ERC721Enumerable {
             );
             ownershipHistory[tokenID].push(AssetHistory(msg.sender, time));
             asset[tokenID].price = 0;
+            asset[tokenID].listed = false;
             return true;
         } else {
             return false;
         }
     }
 
-    function userAssetDetails() public view returns (AssetDetails[] memory) {
+    function assetList() public view returns (AssetDetails[] memory) {
         uint256 contractBalance = balanceOf(address(this));
         uint256 assetOwnerBalance = balanceOf(msg.sender);
         address userAddress = msg.sender;
 
-        AssetDetails[] memory _assetDetails = new AssetDetails[](
+        AssetDetails[] memory _assetList = new AssetDetails[](
             assetOwnerBalance + contractBalance
         );
         // Get list of the assets of the user
         for (uint256 i = 0; i < assetOwnerBalance; i++) {
-            _assetDetails[i] = asset[tokenOfOwnerByIndex(userAddress, i)];
+            _assetList[i] = asset[tokenOfOwnerByIndex(userAddress, i)];
         }
 
         // Get list of the listed assets
@@ -100,14 +102,12 @@ contract Asset is ERC721, Ownable, ERC721Enumerable {
                 uint256 contractTokenID = tokenOfOwnerByIndex(address(this), i);
                 // Check if contract has listed asset of the user
                 if (lastAssetOwner(contractTokenID) == userAddress) {
-                    _assetDetails[i + assetOwnerBalance] = asset[
-                        contractTokenID
-                    ];
+                    _assetList[i + assetOwnerBalance] = asset[contractTokenID];
                 }
             }
         }
 
-        return _assetDetails;
+        return _assetList;
     }
 
     function listAsset(uint256 tokenId, uint256 price) public returns (bool) {
@@ -116,6 +116,7 @@ contract Asset is ERC721, Ownable, ERC721Enumerable {
         // Transfer ownership to the contract
         transferFrom(msg.sender, address(this), tokenId);
         asset[tokenId].price = price;
+        asset[tokenId].listed = true;
         return true;
     }
 

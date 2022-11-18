@@ -33,6 +33,7 @@ function Home() {
 
   useEffect(() => {
     if (address) {
+      console.log(address);
       getTokenBalance(address);
     }
   }, [address]);

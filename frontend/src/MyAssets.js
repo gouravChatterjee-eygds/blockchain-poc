@@ -119,7 +119,7 @@ function MyAssets() {
                         >
                           History
                         </p>
-                        {asset.price === 0 && (
+                        {!asset.listed && (
                           <form
                             method="POST"
                             onSubmit={(e) => listAsset(e, asset.id)}
