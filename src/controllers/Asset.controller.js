@@ -34,12 +34,12 @@ async function createAsset(req) {
   }
 }
 
-async function getAssetList(req) {
+async function getListedAssetList() {
   try {
-    const assetContractDetails = assetContract(req.body.address);
+    const assetContractDetails = assetContract(AssetContractAddress.Asset);
     let getAssetList = await assetContractDetails.userAssetDetails();
     getAssetList = getAssetList.filter((asset) => asset.name !== "");
-    let assetDetails = getAssetList.map((asset) => {
+    let assetList = getAssetList.map((asset) => {
       return {
         id: asset.id.toNumber(),
         name: asset.name,
@@ -48,7 +48,28 @@ async function getAssetList(req) {
         price: asset.price.toNumber(),
       };
     });
-    return { statusCode: 200, assetDetails: assetDetails };
+    return { statusCode: 200, assetList: assetList };
+  } catch (error) {
+    console.log(error);
+    return { statusCode: 502 };
+  }
+}
+
+async function getAssetListofUser(req) {
+  try {
+    const assetContractDetails = assetContract(req.body.address);
+    let getAssetList = await assetContractDetails.userAssetDetails();
+    getAssetList = getAssetList.filter((asset) => asset.name !== "");
+    let assetList = getAssetList.map((asset) => {
+      return {
+        id: asset.id.toNumber(),
+        name: asset.name,
+        desc: asset.desc,
+        readyForSell: asset.price.toNumber() > 0,
+        price: asset.price.toNumber(),
+      };
+    });
+    return { statusCode: 200, assetList: assetList };
   } catch (error) {
     console.log(error);
     return { statusCode: 502 };
@@ -102,7 +123,8 @@ async function getAssetOwnershipHistory(req) {
 
 module.exports = {
   createAsset,
-  getAssetList,
+  getListedAssetList,
+  getAssetListofUser,
   listAsset,
   buyAsset,
   getAssetOwnershipHistory,

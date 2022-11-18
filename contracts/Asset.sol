@@ -25,12 +25,12 @@ contract Asset is ERC721, Ownable, ERC721Enumerable {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIdCounter;
 
-    mapping(uint256 => AssetDetails) private asset;
-    mapping(uint256 => AssetHistory[]) private ownershipHistory;
-
     constructor(address tokenAddress) ERC721("AssetNFT", "NFTASSET") {
         currencyToken = Token(tokenAddress);
     }
+
+    mapping(uint256 => AssetDetails) private asset;
+    mapping(uint256 => AssetHistory[]) private ownershipHistory;
 
     function mintToken(
         string memory name,
@@ -51,6 +51,7 @@ contract Asset is ERC721, Ownable, ERC721Enumerable {
             currencyToken.balanceOf(msg.sender) >= asset[tokenID].price,
             "You don't have enough currency"
         );
+        // Transfer currency
         currencyToken.approveToken(
             msg.sender,
             address(this),
@@ -62,6 +63,7 @@ contract Asset is ERC721, Ownable, ERC721Enumerable {
             asset[tokenID].price
         );
         if (paymentDone) {
+            // Transfer asset ownership
             ERC721(address(this)).transferFrom(
                 address(this),
                 msg.sender,
@@ -79,41 +81,32 @@ contract Asset is ERC721, Ownable, ERC721Enumerable {
         uint256 contractBalance = balanceOf(address(this));
         uint256 assetOwnerBalance = balanceOf(msg.sender);
         address userAddress = msg.sender;
-        require(
-            assetOwnerBalance >= 0,
-            "Transaction can not be processed! No balance"
-        );
-        AssetDetails[] memory assetDetails = new AssetDetails[](
+
+        AssetDetails[] memory _assetDetails = new AssetDetails[](
             assetOwnerBalance + contractBalance
         );
+        // Get list of the assets of the user
         for (uint256 i = 0; i < assetOwnerBalance; i++) {
-            assetDetails[i] = asset[tokenOfOwnerByIndex(userAddress, i)];
+            _assetDetails[i] = asset[tokenOfOwnerByIndex(userAddress, i)];
         }
 
+        // Get list of the listed assets
         if (address(this) != userAddress) {
             for (uint256 i = 0; i < contractBalance; i++) {
                 uint256 contractTokenID = tokenOfOwnerByIndex(address(this), i);
+                // Check if contract has listed asset of the user
                 if (lastAssetOwner(contractTokenID) == userAddress) {
-                    assetDetails[i + assetOwnerBalance] = asset[
+                    _assetDetails[i + assetOwnerBalance] = asset[
                         contractTokenID
                     ];
                 }
             }
         }
 
-        return assetDetails;
-    }
-
-    function getAssetHistory(uint256 tokenID)
-        public
-        view
-        returns (AssetHistory[] memory)
-    {
-        return ownershipHistory[tokenID];
+        return _assetDetails;
     }
 
     function listAsset(uint256 tokenId, uint256 price) public returns (bool) {
-        require(price > 0, "Please provide a price");
         require(lastAssetOwner(tokenId) == msg.sender, "Not correct owner");
         transferFrom(msg.sender, address(this), tokenId);
         asset[tokenId].price = price;
@@ -124,6 +117,14 @@ contract Asset is ERC721, Ownable, ERC721Enumerable {
         return
             ownershipHistory[tokenID][ownershipHistory[tokenID].length - 1]
                 .owner;
+    }
+
+    function getAssetHistory(uint256 tokenID)
+        public
+        view
+        returns (AssetHistory[] memory)
+    {
+        return ownershipHistory[tokenID];
     }
 
     function _beforeTokenTransfer(

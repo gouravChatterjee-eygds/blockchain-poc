@@ -11,15 +11,27 @@ router.post("/asset/create", async (req, res) => {
   }
 });
 
-router.post("/asset/getlist", async (req, res) => {
+// Get asset list of a particluar user
+router.post("/asset/getlistofuser", async (req, res) => {
   try {
-    const response = await AssetController.getAssetList(req);
+    const response = await AssetController.getAssetListofUser(req);
     res.status(response.statusCode).send(response);
   } catch (error) {
     res.status(error.statusCode).send(error);
   }
 });
 
+// Get all the listed assets for sell
+router.get("/asset/getlistedassets", async (req, res) => {
+  try {
+    const response = await AssetController.getListedAssetList();
+    res.status(response.statusCode).send(response);
+  } catch (error) {
+    res.status(error.statusCode).send(error);
+  }
+});
+
+// Create listing for the asset
 router.post("/asset/list", async (req, res) => {
   try {
     const response = await AssetController.listAsset(req);
