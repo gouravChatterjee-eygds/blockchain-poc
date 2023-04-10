@@ -18,6 +18,13 @@ contract Token is ERC20, Ownable {
         return true;
     }
 
+    function transferToken(
+        address receiver,
+        uint256 amount
+    ) public returns (bool) {
+        return transfer(receiver, amount);
+    }
+
     function approveToken(
         address tokenOwner,
         address tokenBuyer,

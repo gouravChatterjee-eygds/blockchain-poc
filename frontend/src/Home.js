@@ -9,7 +9,11 @@ function Home() {
   const address = useAddress();
   const [tokens, setTokens] = useState(0);
   const [purchaseTokens, setPurchaseTokens] = useState(0);
+  const [transferTokenAmount, setTransferTokenAmount] = useState();
+  const [transferTokenAddress, setTransferTokenAddress] = useState();
   const [alertMsg, setAlertMsg] = useState("");
+  const [alertMsg2, setAlertMsg2] = useState("");
+
   const purchaseToken = async () => {
     setAlertMsg("");
     if (!purchaseTokens || purchaseTokens === 0) {
@@ -23,6 +27,27 @@ function Home() {
     setPurchaseTokens(0);
     getTokenBalance();
     // console.log(purchaseToken);
+  };
+
+  const tranfserToken = async () => {
+    setAlertMsg("");
+    if (
+      !transferTokenAmount ||
+      transferTokenAmount === 0 ||
+      !transferTokenAddress ||
+      transferTokenAddress === 0
+    ) {
+      return;
+    }
+    let transferToken = await Token.transferToken(
+      address,
+      transferTokenAddress,
+      transferTokenAmount
+    );
+    setAlertMsg2(transferToken?.message);
+    setTransferTokenAddress();
+    setTransferTokenAmount();
+    getTokenBalance();
   };
 
   const getTokenBalance = async () => {
@@ -61,6 +86,37 @@ function Home() {
     );
   };
 
+  const showTransferToken = () => {
+    return (
+      <div className="flex flex-col items-center">
+        <h5>Transfer Tokens</h5>
+        <input
+          type="text"
+          placeholder="Recipient Address"
+          className="form-control"
+          value={transferTokenAddress}
+          onChange={(e) => setTransferTokenAddress(e.target.value)}
+        />
+
+        <input
+          type="number"
+          placeholder="Amount of tokens"
+          className="form-control mt-4"
+          value={transferTokenAmount}
+          onChange={(e) => setTransferTokenAmount(e.target.value)}
+        />
+        <button
+          className="btn btn-sm btn-primary mt-4"
+          disabled={address && address != "" ? false : true}
+          onClick={tranfserToken}
+        >
+          Transfer Tokens
+        </button>
+        <h6 className="mt-4">{alertMsg2}</h6>
+      </div>
+    );
+  };
+
   return (
     <div>
       <Menu />
@@ -92,7 +148,10 @@ function Home() {
               </div>
             )}
           </div>
-          <div className="col-6 px-4">{showPurchaseToken()}</div>
+          <div className="col-6 px-4">
+            {showPurchaseToken()}
+            {showTransferToken()}
+          </div>
         </div>
 
         {/* <h5 className="text-center italic mt-8">{loadingMessage}</h5> */}

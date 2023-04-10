@@ -13,6 +13,29 @@ class TokenController {
     );
   }
 
+  async transferTokens(req, res) {
+    console.log(req.body);
+    try {
+      let tokenContract = this.currencyContract(req.body.address);
+      let transaction = await tokenContract.transferToken(
+        req.body.receiver,
+        req.body.amount
+      );
+      let receipt = await transaction.wait();
+      console.log(receipt);
+      return {
+        statusCode: 200,
+        message: `You have successfully transferred ${req.body.amount} tokens to ${req.body.receiver}`,
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        statusCode: 502,
+        message: "Sorry please try again",
+      };
+    }
+  }
+
   async mintCurrency(req, res) {
     try {
       console.log(req.body);

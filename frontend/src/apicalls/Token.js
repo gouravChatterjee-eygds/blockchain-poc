@@ -36,6 +36,26 @@ class Token {
       console.log(error);
     }
   };
+
+  transferToken = async (address, receiver, amount) => {
+    try {
+      let transferToken = await fetch(`${apiUrl}/token/transfer`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          address,
+          receiver,
+          amount,
+        }),
+      });
+      transferToken = await transferToken.json();
+      return transferToken;
+    } catch (error) {
+      console.log(error);
+    }
+  };
 }
 
 export default new Token();

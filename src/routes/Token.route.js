@@ -20,4 +20,13 @@ router.post("/token/balance", async (req, res) => {
   }
 });
 
+router.post("/token/transfer", async (req, res) => {
+  try {
+    const response = await TokenController.transferTokens(req, res);
+    res.status(response.statusCode).send(response);
+  } catch (error) {
+    res.status(error.statusCode).send(error);
+  }
+});
+
 module.exports = router;
